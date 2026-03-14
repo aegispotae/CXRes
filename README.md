@@ -101,6 +101,10 @@ CXRes/
 └── Assets.xcassets/         # App icon
 ```
 
+## Acknowledgments
+
+This project was built with the help of [Claude](https://claude.ai) by Anthropic.
+
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
