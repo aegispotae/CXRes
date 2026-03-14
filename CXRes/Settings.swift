@@ -27,6 +27,26 @@ enum AppSettings {
         set { defaults.set(newValue, forKey: "bottleName") }
     }
 
+    /// Returns all CrossOver bottle names found in ~/Library/Application Support/CrossOver/Bottles/.
+    /// Skips symlinks and hidden files.
+    static func availableBottles() -> [String] {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let bottlesDir = "\(home)/Library/Application Support/CrossOver/Bottles"
+        let fm = FileManager.default
+        guard let contents = try? fm.contentsOfDirectory(atPath: bottlesDir) else { return [] }
+        return contents
+            .filter { !$0.hasPrefix(".") }
+            .filter { name in
+                let full = "\(bottlesDir)/\(name)"
+                var isDir: ObjCBool = false
+                guard fm.fileExists(atPath: full, isDirectory: &isDir), isDir.boolValue else { return false }
+                // Skip symlinks (e.g. "default -> Steam")
+                let attrs = try? fm.attributesOfItem(atPath: full)
+                return attrs?[.type] as? FileAttributeType != .typeSymbolicLink
+            }
+            .sorted()
+    }
+
     /// Detects connected displays and creates profiles from their backing-store resolution.
     static func detectDisplayProfiles() -> [ResolutionProfile] {
         let screens = NSScreen.screens
