@@ -11,10 +11,16 @@ enum AppSettings {
 
     static var profiles: [ResolutionProfile] {
         get {
-            guard let data = defaults.data(forKey: "profiles"),
-                  let decoded = try? JSONDecoder().decode([ResolutionProfile].self, from: data)
-            else { return detectDisplayProfiles() }
-            return decoded
+            if let data = defaults.data(forKey: "profiles"),
+               let decoded = try? JSONDecoder().decode([ResolutionProfile].self, from: data) {
+                return decoded
+            }
+            // First launch — detect, store, and return stable IDs
+            let detected = detectDisplayProfiles()
+            if let data = try? JSONEncoder().encode(detected) {
+                defaults.set(data, forKey: "profiles")
+            }
+            return detected
         }
         set {
             let data = try? JSONEncoder().encode(newValue)
