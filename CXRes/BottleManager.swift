@@ -89,6 +89,10 @@ struct BottleManager {
     }
 
     private func writeLines(_ lines: [String]) {
-        try? lines.joined().write(toFile: regPath, atomically: true, encoding: .utf8)
+        do {
+            try lines.joined().write(toFile: regPath, atomically: true, encoding: .utf8)
+        } catch {
+            NSLog("CXRes: failed to write \(regPath): \(error)")
+        }
     }
 }
